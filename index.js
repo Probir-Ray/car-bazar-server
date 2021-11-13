@@ -3,6 +3,7 @@ const app = express();
 const { MongoClient } = require('mongodb');
 const cors = require('cors');
 require('dotenv').config();
+const ObjectId = require('mongodb').ObjectID;
 const port = process.env.PORT || 5000;
 
 app.use(cors());
@@ -18,7 +19,15 @@ async function run() {
         const database = client.db('car_bazar');
         const userCollection = database.collection('users');
         const productCollection = database.collection('products');
+        const orderCollection = database.collection('orders');
         const reviewCollection = database.collection('reviews');
+
+        // GET API: All Products
+        app.get('/allProducts', async(req, res) => {
+          const cursor = productCollection.find({});
+          const products = await cursor.toArray();
+          res.send(products);
+        })
 
         // GET API: All Review
         app.get('/review', async(req, res) => {
@@ -38,12 +47,29 @@ async function run() {
           res.json({admin: isAdmin});
         });
 
+        // Filter data
+        app.get('/purchase/:purchaseId', async (req, res) => {
+          const id = req.params.purchaseId;
+          const query = { _id: ObjectId(id) };
+          const order = await productCollection.findOne(query);
+          console.log('load id', id);
+          res.send(order);
+      })
+
         // Post API: Add new Product
         app.post('/products', async(req, res) => {
           const newProduct = req.body;
           const result = await productCollection.insertOne(newProduct);
           res.json(result);
-        })
+        });
+
+
+        // Add Orders API
+        app.post('/orders', async (req, res) => {
+          const order = req.body;
+          const result = await orderCollection.insertOne(order);
+          res.json(result);
+        });
 
         // Post API: Add new Review
         app.post('/reviews', async(req, res) => {
