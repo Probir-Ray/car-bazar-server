@@ -17,6 +17,15 @@ async function run() {
         await client.connect();
         const database = client.db('car_bazar');
         const userCollection = database.collection('users');
+        const productCollection = database.collection('products');
+        const reviewCollection = database.collection('reviews');
+
+        // GET API: All Review
+        app.get('/review', async(req, res) => {
+          const cursor = reviewCollection.find({});
+          const review = await cursor.toArray();
+          res.send(review);
+        })
 
         app.get('/users/:email', async(req, res) => {
           const email = req.params.email;
@@ -27,6 +36,20 @@ async function run() {
             isAdmin = true;
           }
           res.json({admin: isAdmin});
+        });
+
+        // Post API: Add new Product
+        app.post('/products', async(req, res) => {
+          const newProduct = req.body;
+          const result = await productCollection.insertOne(newProduct);
+          res.json(result);
+        })
+
+        // Post API: Add new Review
+        app.post('/reviews', async(req, res) => {
+          const newReview = req.body;
+          const result = await reviewCollection.insertOne(newReview);
+          res.json(result);
         })
 
         // Add new user to db
