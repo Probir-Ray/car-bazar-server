@@ -120,6 +120,16 @@ async function run() {
         });
 
 
+        // Update order status
+        app.put('/statusUpdate/:id', async(req, res) => {
+          const id = req.params.id;
+          const filter = {_id: ObjectId(id)}
+          const updateDoc = {$set: {status: true}};
+          const result = await orderCollection.updateOne(filter, updateDoc);
+          res.json(result);
+        });
+
+
         // Delete API: Delete a Product
         app.delete('/products/:id', async(req, res) => {
           const id = req.params.id;
