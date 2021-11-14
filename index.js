@@ -36,25 +36,50 @@ async function run() {
           res.send(review);
         })
 
+
+        // GET API: All Orders
+        app.get('/allOrder', async(req, res) => {
+          const cursor = orderCollection.find({});
+          const orders = await cursor.toArray();
+          res.send(orders);
+        })
+
+        
+        // GET API: Manage Products
+        app.get('/manageProducts', async(req, res) => {
+          const cursor = productCollection.find({});
+          const products = await cursor.toArray();
+          res.send(products);
+        })
+
+
         app.get('/users/:email', async(req, res) => {
           const email = req.params.email;
           const query = {email};
           const user = await userCollection.findOne(query);
           let isAdmin = false;
-          if(user?.role === 'admin') {
+          if(user.role === 'admin') { //user?.role
             isAdmin = true;
           }
           res.json({admin: isAdmin});
         });
+
 
         // Filter data
         app.get('/purchase/:purchaseId', async (req, res) => {
           const id = req.params.purchaseId;
           const query = { _id: ObjectId(id) };
           const order = await productCollection.findOne(query);
-          console.log('load id', id);
           res.send(order);
       })
+
+
+        // Filter customer order
+        app.get('/myOrders/:email', async (req, res) => {
+          console.log(req.params.email);
+          const result = await orderCollection.find({ email: req.params.email  }).toArray();
+          res.send(result);
+      })      
 
         // Post API: Add new Product
         app.post('/products', async(req, res) => {
@@ -94,6 +119,15 @@ async function run() {
           const result = await userCollection.updateOne(filter, updateDoc);
           res.json(result);
         });
+
+
+        // Delete API: Delete a Product
+        app.delete('/products/:id', async(req, res) => {
+          const id = req.params.id;
+          const query = {_id: ObjectId(id)}
+          const result = await productCollection.deleteOne(query);
+          res.json(result);
+        })
 
     }
     finally {
