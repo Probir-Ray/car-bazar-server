@@ -58,7 +58,7 @@ async function run() {
           const query = {email};
           const user = await userCollection.findOne(query);
           let isAdmin = false;
-          if(user.role === 'admin') { //user?.role
+          if(user?.role === 'admin') { 
             isAdmin = true;
           }
           res.json({admin: isAdmin});
@@ -76,7 +76,6 @@ async function run() {
 
         // Filter customer order
         app.get('/myOrders/:email', async (req, res) => {
-          console.log(req.params.email);
           const result = await orderCollection.find({ email: req.params.email  }).toArray();
           res.send(result);
       })      
@@ -127,7 +126,16 @@ async function run() {
           const query = {_id: ObjectId(id)}
           const result = await productCollection.deleteOne(query);
           res.json(result);
-        })
+        });
+
+
+        // Delete API: Delete an Order
+        app.delete('/order/:id', async(req, res) => {
+          const id = req.params.id;
+          const query = {_id: ObjectId(id)}
+          const result = await orderCollection.deleteOne(query);
+          res.json(result);
+        });
 
     }
     finally {
