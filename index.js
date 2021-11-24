@@ -3,6 +3,7 @@ const app = express();
 const { MongoClient } = require('mongodb');
 const cors = require('cors');
 require('dotenv').config();
+
 const ObjectId = require('mongodb').ObjectID;
 const port = process.env.PORT || 5000;
 
@@ -102,6 +103,7 @@ async function run() {
           res.json(result);
         })
 
+        
         // Add new user to db
         app.post('/users', async(req, res) => {
           const user = req.body;
@@ -109,6 +111,7 @@ async function run() {
           res.json(result);
           console.log(result);
         });
+
 
         // Make admin method
         app.put('/users/admin', async(req, res) => {
